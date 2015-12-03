@@ -2,15 +2,7 @@ import os, sys, time
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.misc as sm
 
-
-#IMAGE_DIR = "images"
-IMAGE_DIR = "images"
-
-IMAGE_SIZE = (600, 800)
-RESIZE_IMG = 0.5
-EDGE_THRES = 0.9
 
 #-------------------------------------------------------------------------------
 
@@ -37,36 +29,13 @@ class IntegralImage:
         
 #-------------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    print "Lacunarity"
-    print " started", time.strftime("%a %d.%m.%Y %H.%M")
-
-    np.set_printoptions(precision=4, suppress=True, linewidth=160)
-
-    img = np.asarray(
-          [[1,1,0,1,1,1,0,1,0,1,1,0],
-           [0,0,0,0,0,1,0,0,0,1,1,1],
-           [0,1,0,1,1,1,1,1,0,1,1,0],
-           [1,0,1,1,1,0,0,0,0,0,0,0],
-           [1,1,0,1,0,1,0,0,1,1,0,0],
-           [0,1,0,1,1,0,0,1,0,0,1,0],
-           [0,0,0,0,0,1,1,1,1,1,1,1],
-           [0,1,1,0,0,0,1,1,1,1,0,0],
-           [0,1,1,1,0,1,1,0,1,0,0,1],
-           [0,1,0,0,0,0,0,0,0,1,1,1],
-           [0,1,0,1,1,1,0,1,1,0,1,0],
-           [0,1,0,0,0,1,0,1,1,1,0,1]])
-
-    img = np.round(np.random.rand(1024,1024)+0.2)
-    print img
-
-
+def analyze_lacunarity(img, box_sizes=[1,2,4,8,16,32,64,128]):
     int_img = IntegralImage(img)
 
-    R = [1,2,4,8,16,32,64,128] # box sizes
-    for r in R:
-        print r
+    result_log = np.zeros((len(box_sizes)))
+    result_lac = np.zeros((len(box_sizes)))
 
+    for n,r in enumerate(box_sizes):
         counts = np.zeros(r*r + 1)
         counts_range = np.arange(r*r+1)
         
@@ -83,9 +52,38 @@ if __name__ == "__main__":
         z2 = np.sum(counts_range**2 * counts)
         lac = z2/(z1*z1)
 
-        print "Lacunarity =", lac
+        result_log[n] = np.log(r)
+        result_lac[n] = np.log(lac)
 
- 
+    return result_log, result_lac
 
-        # plt.figure(4),plt.imshow(distribution, cmap="jet"), plt.colorbar()
-        # plt.show()
+
+def test():
+    img = np.asarray(
+          [[1,1,0,1,1,1,0,1,0,1,1,0],
+           [0,0,0,0,0,1,0,0,0,1,1,1],
+           [0,1,0,1,1,1,1,1,0,1,1,0],
+           [1,0,1,1,1,0,0,0,0,0,0,0],
+           [1,1,0,1,0,1,0,0,1,1,0,0],
+           [0,1,0,1,1,0,0,1,0,0,1,0],
+           [0,0,0,0,0,1,1,1,1,1,1,1],
+           [0,1,1,0,0,0,1,1,1,1,0,0],
+           [0,1,1,1,0,1,1,0,1,0,0,1],
+           [0,1,0,0,0,0,0,0,0,1,1,1],
+           [0,1,0,1,1,1,0,1,1,0,1,0],
+           [0,1,0,0,0,1,0,1,1,1,0,1]])
+
+    lo, la = analyze_lacunarity(img, box_sizes=[1,2,4,8])
+
+    plt.figure(4),plt.plot(lo, la)
+    plt.show()
+
+#-------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    print "Lacunarity"
+    print " started", time.strftime("%a %d.%m.%Y %H.%M")
+
+    np.set_printoptions(precision=4, suppress=True, linewidth=160)
+
+    test()
