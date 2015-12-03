@@ -25,34 +25,16 @@ class IntegralImage:
                 self.int_img[y,x] = self.int_img[y-1,x] + zeile 
     
     
-    def sum(self, p1, p2):
-        """
-        to get sum from integral image, p1 and p2 are both included 
-            i.e. (0,0)(0,0) is value of first pixel
-                 (0,0)(1,1) is value of first 2x2 box
-                 (1,1)(1,1) is value of first diagonal pixel
-        """
-        s = self.int_img[p1[0]+p2[0]-1, p1[1]+p2[1]-1]
-        print self.int_img[p1[0]+p2[0]-1, p1[1]+p2[1]-1],
+    def sum(self, p1, box_size):
+        s = self.int_img[p1[0]+box_size[0]-1, p1[1]+box_size[1]-1]
         if p1[0]>0:
-            s -= self.int_img[p1[0]-1, p1[1]+p2[1]-1]
+            s -= self.int_img[p1[0]-1, p1[1]+box_size[1]-1]
         if p1[1]>0:
-            s -= self.int_img[p1[0]+p2[0]-1, p1[1]-1]
+            s -= self.int_img[p1[0]+box_size[0]-1, p1[1]-1]
         if p1[0]>0 and p1[1]>0:
             s += self.int_img[p1[0]-1, p1[1]-1]
-            print "+",self.int_img[p1[0], p1[1]],
-        print ""
         return s
         
-        
-        #if p1[1]>0:
-        #    s -= self.int_img[p2[0],p1[1]-1]
-        #if p1[0]>0:
-        #    s -= self.int_img[p1[0]-1,p2[1]]
-        #if p1[0]>0 and p1[1]>0:
-        #    s += self.int_img[p1[0]-1,p1[1]-1]
-        #return s;
-
 #-------------------------------------------------------------------------------
 
 if __name__ == "__main__":
@@ -77,29 +59,28 @@ if __name__ == "__main__":
 
     int_img = IntegralImage(img)
 
-    print int_img.int_img
-
-
-    box_size = 2
-    counts = np.zeros(box_size * box_size+1)
+    r = 2 # box size
+    counts = np.zeros(r*r + 1)
     
-    print "=",int_img.sum((0,0),(1,1))
-    print "=",int_img.sum((0,0),(2,2))
-    print "=",int_img.sum((0,0),(3,3))
-    print "=",int_img.sum((0,0),(4,4))
-    print "=",int_img.sum((1,1),(4,4))
-    print "=",int_img.sum((0,0),(12,12))
-    print "=",int_img.sum((1,0),(11,12))
-    print "=",int_img.sum((2,0),(10,12))
+    # N(r) = (M-r+1)^2
+    for y in range(img.shape[0]-r+1):
+        for x in range(img.shape[1]-r+1):
+            s = int_img.sum((y,x),(r, r))
+            counts[s] += 1
 
-    print "=",int_img.sum((1,2),(11,10))
+    # to probability distribution
+    counts = counts/((img.shape[0]-r+1)*(img.shape[1]-r+1))
 
-    #for y in range(img.shape[0]-1):
-    #    for x in range(img.shape[1]-1):
-    #        s = int_img.sum((y,x),(y+box_size-1,x+box_size-1))
-    #        counts[s] += 1
+    print counts
 
-    #print counts
+    z1,z2 = 0,0
+    for i in range(counts.shape[0]):
+        z1 += i * counts[i]
+        z2 += i*i * counts[i]
+
+    print z1,z2
+    print "Lacunarity =", z2/(z1*z1)
+
  
 
     # plt.figure(4),plt.imshow(distribution, cmap="jet"), plt.colorbar()
