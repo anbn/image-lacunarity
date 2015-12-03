@@ -73,12 +73,17 @@ def test():
            [0,1,0,1,1,1,0,1,1,0,1,0],
            [0,1,0,0,0,1,0,1,1,1,0,1]])
 
-    img2 = np.zeros((1728,1728)) # np.round(np.random.rand(1200,1200))
+    img2 = np.zeros((144,144)) # np.round(np.random.rand(1200,1200))
 
-    for y in range(144):
-        for x in range(144):
-            if img[y/12,x/12]==1 and img[y%12,x%12]==1 :
-                img2[12*y:12*(y+1), 12*(x):12*(x+1)] = img
+    for y in range(12):
+        for x in range(12):
+            if img[y,x]==1:
+                img2[12*x:12*(x+1),12*y:12*(y+1)] = 1
+
+    # for y in range(144):
+    #     for x in range(144):
+    #         if img[y/12,x/12]==1 and img[y%12,x%12]==1:
+    #             img2[12*y:12*(y+1), 12*(x):12*(x+1)] = img
 
     plt.imshow(img2, interpolation="none")
     plt.show()
