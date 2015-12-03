@@ -57,31 +57,35 @@ if __name__ == "__main__":
            [0,1,0,1,1,1,0,1,1,0,1,0],
            [0,1,0,0,0,1,0,1,1,1,0,1]])
 
+    img = np.round(np.random.rand(1024,1024)+0.2)
+    print img
+
+
     int_img = IntegralImage(img)
 
-    r = 2 # box size
-    counts = np.zeros(r*r + 1)
-    
-    # N(r) = (M-r+1)^2
-    for y in range(img.shape[0]-r+1):
-        for x in range(img.shape[1]-r+1):
-            s = int_img.sum((y,x),(r, r))
-            counts[s] += 1
+    R = [1,2,4,8,16,32,64,128] # box sizes
+    for r in R:
+        print r
 
-    # to probability distribution
-    counts = counts/((img.shape[0]-r+1)*(img.shape[1]-r+1))
+        counts = np.zeros(r*r + 1)
+        counts_range = np.arange(r*r+1)
+        
+        # N(r) = (M-r+1)^2
+        for y in range(img.shape[0]-r+1):
+            for x in range(img.shape[1]-r+1):
+                s = int_img.sum((y,x),(r, r))
+                counts[s] += 1
 
-    print counts
+        # to probability distribution
+        counts = counts/((img.shape[0]-r+1)*(img.shape[1]-r+1))
 
-    z1,z2 = 0,0
-    for i in range(counts.shape[0]):
-        z1 += i * counts[i]
-        z2 += i*i * counts[i]
+        z1 = np.sum(counts_range    * counts)
+        z2 = np.sum(counts_range**2 * counts)
+        lac = z2/(z1*z1)
 
-    print z1,z2
-    print "Lacunarity =", z2/(z1*z1)
+        print "Lacunarity =", lac
 
  
 
-    # plt.figure(4),plt.imshow(distribution, cmap="jet"), plt.colorbar()
-    # plt.show()
+        # plt.figure(4),plt.imshow(distribution, cmap="jet"), plt.colorbar()
+        # plt.show()
