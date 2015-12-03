@@ -73,7 +73,18 @@ def test():
            [0,1,0,1,1,1,0,1,1,0,1,0],
            [0,1,0,0,0,1,0,1,1,1,0,1]])
 
-    lo, la = analyze_lacunarity(img, box_sizes=[1,2,4,8])
+    img2 = np.zeros((1728,1728)) # np.round(np.random.rand(1200,1200))
+
+    for y in range(144):
+        for x in range(144):
+            if img[y/12,x/12]==1 and img[y%12,x%12]==1 :
+                img2[12*y:12*(y+1), 12*(x):12*(x+1)] = img
+
+    plt.imshow(img2, interpolation="none")
+    plt.show()
+
+
+    lo, la = analyze_lacunarity(img2)
 
     plt.figure(4),plt.plot(lo, la)
     plt.show()
